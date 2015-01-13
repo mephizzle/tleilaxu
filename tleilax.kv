@@ -1,0 +1,47 @@
+ScreenManager:
+    MainScreen:
+        name: 'main'
+        ip: ip
+        port: port
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Tleilax'
+                size_hint_y: None
+                height: '40sp'
+                font_size: '30sp'
+            BoxLayout:
+                size_hint_y: None
+                height: '30sp'
+                Label:
+                    size_hint_x: None
+                    width: '70sp'
+                    text: 'host'
+                TextInput:
+                    id: ip
+                    text: '192.168.9.104'
+            BoxLayout:
+                size_hint_y: None
+                height: '30sp'
+                Label:
+                    size_hint_x: None
+                    width: '70sp'
+                    text: 'port'
+                TextInput:
+                    text: '8080'
+                    id: port
+            BoxLayout:
+                Widget:
+                Button:
+                    size_hint: [None, None]
+                    size: ['120sp', '30sp']
+                    text: 'deploy'
+                    on_press: root.current_screen.do_deploy()
+                Widget:
+            Widget:
+
+<OutputScreen>:
+    name: 'output'
+    Label:
+        text: 'loading...'
+        font_size: '30sp'

@@ -10,12 +10,28 @@ from kivy.properties import (
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
+from kivy.storage.jsonstore import JsonStore
+
+
+class Storage(JsonStore):
+    def get(self, name, default):
+        try:
+            return super(Storage, self).get(name)
+        except KeyError:
+            return default
+storage = Storage('tleilax.json')
 
 
 KIVY_ROOT_DIR = '/sdcard/kivy/'
 
 
-class OutputScreen(Screen):
+class TleilaxScreen(Screen):
+    def __init__(self, *args, **kwargs):
+        super(TleilaxScreen, self).__init__(*args, **kwargs)
+        self.app = App.get_running_app()
+
+
+class OutputScreen(TleilaxScreen):
     host = StringProperty()
 
     def on_enter(self):
@@ -74,11 +90,14 @@ class OutputScreen(Screen):
         self.message('done')
 
 
-class MainScreen(Screen):
+class MainScreen(TleilaxScreen):
     ip = ObjectProperty()
     port = ObjectProperty()
 
     def do_deploy(self):
+        self.app.ip = self.ip.text
+        self.app.port = self.port.text
+
         output = OutputScreen()
 
         output.host = 'http://{0}:{1}'.format(
@@ -91,7 +110,24 @@ class MainScreen(Screen):
 
 
 class TleilaxApp(App):
-    host = ObjectProperty()
+    def __init__(self, *args, **kwargs):
+        super(TleilaxApp, self).__init__(*args, **kwargs)
+        self.load()
+
+    def load(self):
+        host = storage.get('host', {})
+        self.ip = host.get('ip', '192.168.1.1')
+        self.port = host.get('port', '8080')
+
+    def save(self):
+        host = {
+            'ip': self.ip,
+            'port': self.port
+        }
+        storage.put('host', **host)
+
+    def on_stop(self):
+        self.save()
 
 
 TleilaxApp().run()
